@@ -60,11 +60,11 @@ export default function NewJokeRoute() {
 
   return (
     <div>
-      <p>Add your own hilarious joke</p>
+      <p>面白いジョークを追加してください</p>
       <form method="post">
         <div>
           <label>
-            Name:{" "}
+            名前:{" "}
             <input
               defaultValue={actionData?.fields?.name}
               name="name"
@@ -91,7 +91,7 @@ export default function NewJokeRoute() {
         </div>
         <div>
           <label>
-            Content:{" "}
+          コンテンツ:{" "}
             <textarea
               defaultValue={actionData?.fields?.content}
               name="content"
@@ -125,10 +125,18 @@ export default function NewJokeRoute() {
             </p>
           ) : null}
           <button type="submit" className="button">
-            Add
+          追加
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+export function ErrorBoundary() {
+  return (
+    <div className="error-container">
+      Something unexpected went wrong. Sorry about that.
     </div>
   );
 }
