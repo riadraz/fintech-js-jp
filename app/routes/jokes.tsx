@@ -4,6 +4,7 @@ import type {
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
+  Form,
   Link,
   Outlet,
   useLoaderData,
@@ -40,8 +41,8 @@ export default function JokesRoute() {
           <h1 className="home-link">
             <Link
               to="/"
-              title="Remix Jokes"
-              aria-label="Remix Jokes"
+              title="Remix ジョークス"
+              aria-label="Remix ジョークス"
             >
               <span className="logo">🤪</span>
               <span className="logo-medium">J🤪KES</span>
@@ -50,11 +51,11 @@ export default function JokesRoute() {
           {data.user ? (
             <div className="user-info">
               <span>{`Hi ${data.user.username}`}</span>
-              <form action="/logout" method="post">
+              <Form action="/logout" method="post">
                 <button type="submit" className="button">
-                ログアウト
+                  ロゴアウト
                 </button>
-              </form>
+              </Form>
             </div>
           ) : (
             <Link to="/login">ログイン</Link>
@@ -69,7 +70,9 @@ export default function JokesRoute() {
             <ul>
               {data.jokeListItems.map(({ id, name }) => (
                 <li key={id}>
-                  <Link to={id}>{name}</Link>
+                  <Link prefetch="intent" to={id}>
+                    {name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -82,6 +85,13 @@ export default function JokesRoute() {
           </div>
         </div>
       </main>
+      <footer className="jokes-footer">
+        <div className="container">
+          <Link reloadDocument to="/jokes.rss">
+            RSS
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }

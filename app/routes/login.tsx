@@ -1,8 +1,10 @@
 import type {
   ActionFunctionArgs,
   LinksFunction,
+  MetaFunction,
 } from "@remix-run/node";
 import {
+  Form,
   Link,
   useActionData,
   useSearchParams,
@@ -21,15 +23,26 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesUrl },
 ];
 
+export const meta: MetaFunction = () => {
+  const description =
+    "ログインして自分のジョークを Remix Jokes に投稿してください。";
+
+  return [
+    { name: "description", content: description },
+    { name: "twitter:description", content: description },
+    { title: "リミックスジョーク | ログイン" },
+  ];
+};
+
 function validateUsername(username: string) {
   if (username.length < 3) {
-    return "Usernames must be at least 3 characters long";
+    return "ユーザー名は少なくとも 3 文字の長さである必要があります";
   }
 }
 
 function validatePassword(password: string) {
   if (password.length < 6) {
-    return "Passwords must be at least 6 characters long";
+    return "パスワードは6文字以上である必要があります";
   }
 }
 
@@ -129,7 +142,7 @@ export default function Login() {
     <div className="container">
       <div className="content" data-light="">
         <h1>Login</h1>
-        <form method="post">
+        <Form method="post">
           <input
             type="hidden"
             name="redirectTo"
@@ -231,7 +244,7 @@ export default function Login() {
           <button type="submit" className="button">
             Submit
           </button>
-        </form>
+        </Form>
       </div>
       <div className="links">
         <ul>

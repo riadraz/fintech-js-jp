@@ -19,6 +19,11 @@ export default function IndexRoute() {
             <li>
               <Link to="jokes">ジョークを読む</Link>
             </li>
+            <li>
+              <Link reloadDocument to="/jokes.rss">
+                RSS
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>

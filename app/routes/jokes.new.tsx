@@ -1,10 +1,34 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { useActionData } from "@remix-run/react";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import {
+  Form,
+  isRouteErrorResponse,
+  Link,
+  useActionData,
+  useNavigation,
+  useRouteError,
+} from "@remix-run/react";
 
+import { JokeDisplay } from "~/components/joke";
 import { db } from "~/utils/db.server";
 import { badRequest } from "~/utils/request.server";
-import { requireUserId } from "~/utils/session.server";
+import {
+  getUserId,
+  requireUserId,
+} from "~/utils/session.server";
+
+export const loader = async ({
+  request,
+}: LoaderFunctionArgs) => {
+  const userId = await getUserId(request);
+  if (!userId) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+  return json({});
+};
 
 function validateJokeContent(content: string) {
   if (content.length < 10) {
@@ -57,14 +81,34 @@ export const action = async ({
 
 export default function NewJokeRoute() {
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+
+  if (navigation.formData) {
+    const content = navigation.formData.get("content");
+    const name = navigation.formData.get("name");
+    if (
+      typeof content === "string" &&
+      typeof name === "string" &&
+      !validateJokeContent(content) &&
+      !validateJokeName(name)
+    ) {
+      return (
+        <JokeDisplay
+          canDelete={false}
+          isOwner={true}
+          joke={{ name, content }}
+        />
+      );
+    }
+  }
 
   return (
     <div>
-      <p>面白いジョークを追加してください</p>
-      <form method="post">
+      <p>Add your own hilarious joke</p>
+      <Form method="post">
         <div>
           <label>
-            名前:{" "}
+            Name:{" "}
             <input
               defaultValue={actionData?.fields?.name}
               name="name"
@@ -91,7 +135,7 @@ export default function NewJokeRoute() {
         </div>
         <div>
           <label>
-          コンテンツ:{" "}
+            Content:{" "}
             <textarea
               defaultValue={actionData?.fields?.content}
               name="content"
@@ -125,15 +169,27 @@ export default function NewJokeRoute() {
             </p>
           ) : null}
           <button type="submit" className="button">
-          追加
+            Add
           </button>
         </div>
-      </form>
+      </Form>
     </div>
   );
 }
 
 export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+
+  if (isRouteErrorResponse(error) && error.status === 401) {
+    return (
+      <div className="error-container">
+        <p>You must be logged in to create a joke.</p>
+        <Link to="/login">Login</Link>
+      </div>
+    );
+  }
+
   return (
     <div className="error-container">
       Something unexpected went wrong. Sorry about that.
